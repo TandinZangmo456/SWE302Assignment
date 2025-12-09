@@ -1,0 +1,9 @@
+CLAUDE.md
+gorm.dbgolang-gin-realworld-example-app/
+react-redux-realworld-example-app/
+sonar-scanner*/
+snyk
+*.jar
+node_modules/
+dist/
+build/

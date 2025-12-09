@@ -1,0 +1,5 @@
+mode: set
+realworld-backend/hello.go:15.27,22.2 6 0
+realworld-backend/hello.go:24.13,54.41 16 0
+realworld-backend/hello.go:54.41,58.3 1 0
+realworld-backend/hello.go:61.2,81.9 6 0
