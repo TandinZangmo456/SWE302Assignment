@@ -210,10 +210,6 @@ realworld-backend/users/validators.go:72.56,74.16 2 0
 realworld-backend/users/validators.go:74.16,76.3 1 0
 realworld-backend/users/validators.go:78.2,79.12 2 0
 realworld-backend/users/validators.go:83.41,86.2 2 0
-realworld-backend/hello.go:15.27,22.2 6 0
-realworld-backend/hello.go:24.13,54.41 16 0
-realworld-backend/hello.go:54.41,58.3 1 0
-realworld-backend/hello.go:61.2,81.9 6 0
 realworld-backend/common/database.go:17.22,19.16 2 1
 realworld-backend/common/database.go:19.16,21.3 1 0
 realworld-backend/common/database.go:22.2,25.11 3 1
@@ -233,3 +229,7 @@ realworld-backend/common/utils.go:61.9,63.4 1 0
 realworld-backend/common/utils.go:66.2,66.12 1 0
 realworld-backend/common/utils.go:70.50,75.2 4 1
 realworld-backend/common/utils.go:80.50,83.2 2 0
+realworld-backend/hello.go:15.27,22.2 6 0
+realworld-backend/hello.go:24.13,54.41 16 0
+realworld-backend/hello.go:54.41,58.3 1 0
+realworld-backend/hello.go:61.2,81.9 6 0

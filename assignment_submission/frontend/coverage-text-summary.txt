@@ -1,0 +1,3 @@
+Frontend Coverage Summary
+========================
+Run 'npm test -- --coverage' to generate detailed coverage

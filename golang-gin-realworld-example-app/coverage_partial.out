@@ -1,4 +1,4 @@
-mode: set
+mode: atomic
 realworld-backend/users/middlewares.go:13.67,15.59 1 0
 realworld-backend/users/middlewares.go:15.59,17.3 1 0
 realworld-backend/users/middlewares.go:18.2,18.17 1 0
@@ -210,3 +210,26 @@ realworld-backend/articles/validators.go:58.55,60.2 1 0
 realworld-backend/articles/validators.go:62.60,66.16 3 0
 realworld-backend/articles/validators.go:66.16,68.3 1 0
 realworld-backend/articles/validators.go:69.2,71.12 3 0
+realworld-backend/hello.go:15.27,22.2 6 0
+realworld-backend/hello.go:24.13,54.41 16 0
+realworld-backend/hello.go:54.41,58.3 1 0
+realworld-backend/hello.go:61.2,81.9 6 0
+realworld-backend/common/database.go:17.22,19.16 2 2
+realworld-backend/common/database.go:19.16,21.3 1 0
+realworld-backend/common/database.go:22.2,25.11 3 2
+realworld-backend/common/database.go:29.28,31.16 2 3
+realworld-backend/common/database.go:31.16,33.3 1 0
+realworld-backend/common/database.go:34.2,37.11 4 3
+realworld-backend/common/database.go:41.41,45.2 3 3
+realworld-backend/common/database.go:48.23,50.2 1 2
+realworld-backend/common/utils.go:19.31,21.19 2 8
+realworld-backend/common/utils.go:21.19,23.3 1 226
+realworld-backend/common/utils.go:24.2,24.18 1 8
+realworld-backend/common/utils.go:32.31,42.2 4 5
+realworld-backend/common/utils.go:52.47,56.25 4 0
+realworld-backend/common/utils.go:56.25,59.22 1 0
+realworld-backend/common/utils.go:59.22,61.4 1 0
+realworld-backend/common/utils.go:61.9,63.4 1 0
+realworld-backend/common/utils.go:66.2,66.12 1 0
+realworld-backend/common/utils.go:70.50,75.2 4 2
+realworld-backend/common/utils.go:80.50,83.2 2 0

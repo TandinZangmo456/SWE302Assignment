@@ -63,15 +63,21 @@
 				
 				<option value="file3">realworld-backend/articles/validators.go (0.0%)</option>
 				
-				<option value="file4">realworld-backend/users/middlewares.go (0.0%)</option>
+				<option value="file4">realworld-backend/common/database.go (88.2%)</option>
 				
-				<option value="file5">realworld-backend/users/models.go (0.0%)</option>
+				<option value="file5">realworld-backend/common/utils.go (54.5%)</option>
 				
-				<option value="file6">realworld-backend/users/routers.go (0.0%)</option>
+				<option value="file6">realworld-backend/hello.go (0.0%)</option>
 				
-				<option value="file7">realworld-backend/users/serializers.go (0.0%)</option>
+				<option value="file7">realworld-backend/users/middlewares.go (0.0%)</option>
 				
-				<option value="file8">realworld-backend/users/validators.go (0.0%)</option>
+				<option value="file8">realworld-backend/users/models.go (0.0%)</option>
+				
+				<option value="file9">realworld-backend/users/routers.go (0.0%)</option>
+				
+				<option value="file10">realworld-backend/users/serializers.go (0.0%)</option>
+				
+				<option value="file11">realworld-backend/users/validators.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -785,7 +791,228 @@ func (s *CommentModelValidator) Bind(c *gin.Context) error <span class="cov0" ti
 }
 </pre>
 		
-		<pre class="file" id="file4" style="display: none">package users
+		<pre class="file" id="file4" style="display: none">package common
+
+import (
+        "fmt"
+        "github.com/jinzhu/gorm"
+        _ "github.com/jinzhu/gorm/dialects/sqlite"
+        "os"
+)
+
+type Database struct {
+        *gorm.DB
+}
+
+var DB *gorm.DB
+
+// Opening a database and save the reference to `Database` struct.
+func Init() *gorm.DB <span class="cov8" title="1">{
+        db, err := gorm.Open("sqlite3", "./../gorm.db")
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("db err: (Init) ", err)
+        }</span>
+        <span class="cov8" title="1">db.DB().SetMaxIdleConns(10)
+        //db.LogMode(true)
+        DB = db
+        return DB</span>
+}
+
+// This function will create a temporarily database for running testing cases
+func TestDBInit() *gorm.DB <span class="cov8" title="1">{
+        test_db, err := gorm.Open("sqlite3", "./../gorm_test.db")
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("db err: (TestDBInit) ", err)
+        }</span>
+        <span class="cov8" title="1">test_db.DB().SetMaxIdleConns(3)
+        test_db.LogMode(true)
+        DB = test_db
+        return DB</span>
+}
+
+// Delete the database after running testing cases.
+func TestDBFree(test_db *gorm.DB) error <span class="cov8" title="1">{
+        test_db.Close()
+        err := os.Remove("./../gorm_test.db")
+        return err
+}</span>
+
+// Using this function to get a connection, you can create your connection pool here.
+func GetDB() *gorm.DB <span class="cov8" title="1">{
+        return DB
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">// Common tools and helper functions
+package common
+
+import (
+        "fmt"
+        "math/rand"
+        "time"
+
+        "github.com/dgrijalva/jwt-go"
+        "github.com/go-playground/validator/v10"
+
+        "github.com/gin-gonic/gin/binding"
+        "github.com/gin-gonic/gin"
+)
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+// A helper function to generate random string
+func RandString(n int) string <span class="cov8" title="1">{
+        b := make([]rune, n)
+        for i := range b </span><span class="cov8" title="1">{
+                b[i] = letters[rand.Intn(len(letters))]
+        }</span>
+        <span class="cov8" title="1">return string(b)</span>
+}
+
+// Keep this two config private, it should not expose to open source
+const NBSecretPassword = "A String Very Very Very Strong!!@##$!@#$"
+const NBRandomPassword = "A String Very Very Very Niubilty!!@##$!@#4"
+
+// A Util function to generate jwt_token which can be used in the request header
+func GenToken(id uint) string <span class="cov8" title="1">{
+        jwt_token := jwt.New(jwt.GetSigningMethod("HS256"))
+        // Set some claims
+        jwt_token.Claims = jwt.MapClaims{
+                "id":  id,
+                "exp": time.Now().Add(time.Hour * 24).Unix(),
+        }
+        // Sign and get the complete encoded token as a string
+        token, _ := jwt_token.SignedString([]byte(NBSecretPassword))
+        return token
+}</span>
+
+// My own Error type that will help return my customized Error info
+//  {"database": {"hello":"no such table", error: "not_exists"}}
+type CommonError struct {
+        Errors map[string]interface{} `json:"errors"`
+}
+
+// To handle the error returned by c.Bind in gin framework
+// https://github.com/go-playground/validator/blob/v9/_examples/translations/main.go
+func NewValidatorError(err error) CommonError <span class="cov0" title="0">{
+        res := CommonError{}
+        res.Errors = make(map[string]interface{})
+        errs := err.(validator.ValidationErrors)
+        for _, v := range errs </span><span class="cov0" title="0">{
+                // can translate each error one at a time.
+                //fmt.Println("gg",v.NameNamespace)
+                if v.Param() != "" </span><span class="cov0" title="0">{
+                        res.Errors[v.Field()] = fmt.Sprintf("{%v: %v}", v.Tag(), v.Param())
+                }</span> else<span class="cov0" title="0"> {
+                        res.Errors[v.Field()] = fmt.Sprintf("{key: %v}", v.Tag())
+                }</span>
+
+        }
+        <span class="cov0" title="0">return res</span>
+}
+
+// Warp the error info in a object
+func NewError(key string, err error) CommonError <span class="cov8" title="1">{
+        res := CommonError{}
+        res.Errors = make(map[string]interface{})
+        res.Errors[key] = err.Error()
+        return res
+}</span>
+
+// Changed the c.MustBindWith() -&gt;  c.ShouldBindWith().
+// I don't want to auto return 400 when error happened.
+// origin function is here: https://github.com/gin-gonic/gin/blob/master/context.go
+func Bind(c *gin.Context, obj interface{}) error <span class="cov0" title="0">{
+        b := binding.Default(c.Request.Method, c.ContentType())
+        return c.ShouldBindWith(obj, b)
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package main
+
+import (
+        "fmt"
+
+        "github.com/gin-gonic/gin"
+        "github.com/gin-contrib/cors"
+
+        "github.com/jinzhu/gorm"
+        "realworld-backend/articles"
+        "realworld-backend/common"
+        "realworld-backend/users"
+)
+
+func Migrate(db *gorm.DB) <span class="cov0" title="0">{
+        users.AutoMigrate()
+        db.AutoMigrate(&amp;articles.ArticleModel{})
+        db.AutoMigrate(&amp;articles.TagModel{})
+        db.AutoMigrate(&amp;articles.FavoriteModel{})
+        db.AutoMigrate(&amp;articles.ArticleUserModel{})
+        db.AutoMigrate(&amp;articles.CommentModel{})
+}</span>
+
+func main() <span class="cov0" title="0">{
+
+        db := common.Init()
+        Migrate(db)
+        defer db.Close()
+
+        r := gin.Default()
+
+        // Configure CORS
+        r.Use(cors.New(cors.Config{
+                AllowOrigins:     []string{"http://localhost:4100"},
+                AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+                AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+                AllowCredentials: true,
+        }))
+
+        v1 := r.Group("/api")
+        users.UsersRegister(v1.Group("/users"))
+        v1.Use(users.AuthMiddleware(false))
+        articles.ArticlesAnonymousRegister(v1.Group("/articles"))
+        articles.TagsAnonymousRegister(v1.Group("/tags"))
+
+        v1.Use(users.AuthMiddleware(true))
+        users.UserRegister(v1.Group("/user"))
+        users.ProfileRegister(v1.Group("/profiles"))
+
+        articles.ArticlesRegister(v1.Group("/articles"))
+
+        testAuth := r.Group("/api/ping")
+
+        testAuth.GET("/", func(c *gin.Context) </span><span class="cov0" title="0">{
+                c.JSON(200, gin.H{
+                        "message": "pong",
+                })
+        }</span>)
+
+        // test 1 to 1
+        <span class="cov0" title="0">tx1 := db.Begin()
+        userA := users.UserModel{
+                Username: "AAAAAAAAAAAAAAAA",
+                Email:    "aaaa@g.cn",
+                Bio:      "hehddeda",
+                Image:    nil,
+        }
+        tx1.Save(&amp;userA)
+        tx1.Commit()
+        fmt.Println(userA)
+
+        //db.Save(&amp;ArticleUserModel{
+        //    UserModelID:userA.ID,
+        //})
+        //var userAA ArticleUserModel
+        //db.Where(&amp;ArticleUserModel{
+        //    UserModelID:userA.ID,
+        //}).First(&amp;userAA)
+        //fmt.Println(userAA)
+
+        r.Run()</span> // listen and serve on 0.0.0.0:8080
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package users
 
 import (
         "github.com/dgrijalva/jwt-go"
@@ -854,7 +1081,7 @@ func AuthMiddleware(auto401 bool) gin.HandlerFunc <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file5" style="display: none">package users
+		<pre class="file" id="file8" style="display: none">package users
 
 import (
         "errors"
@@ -1006,7 +1233,7 @@ func (u UserModel) GetFollowings() []UserModel <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file6" style="display: none">package users
+		<pre class="file" id="file9" style="display: none">package users
 
 import (
         "errors"
@@ -1139,7 +1366,7 @@ func UserUpdate(c *gin.Context) <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file7" style="display: none">package users
+		<pre class="file" id="file10" style="display: none">package users
 
 import (
         "github.com/gin-gonic/gin"
@@ -1199,7 +1426,7 @@ func (self *UserSerializer) Response() UserResponse <span class="cov0" title="0"
 }</span>
 </pre>
 		
-		<pre class="file" id="file8" style="display: none">package users
+		<pre class="file" id="file11" style="display: none">package users
 
 import (
         "realworld-backend/common"
